@@ -34,6 +34,22 @@ BLACKLIST = [
     "pidaraz",
     "ami",
     "qotagim",
+       "Minet",
+    "Porno",
+    "Kotmisan",
+    "Nastroy",
+    "Am",
+    "Jalab",
+    "Jallab",
+    "Kot",
+    "Am",
+    "Aminga",
+    "Suka",
+    "Dalbayop",
+    "Suchara",
+    "Pidaraz",
+    "Ami",
+    "Qotagim",
 ]
 
 @dp.message(Command("start"))
