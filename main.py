@@ -7,6 +7,7 @@ from aiogram.filters import Command
 from aiogram.types import Message
 
 TOKEN = os.getenv("BOT_TOKEN")
+OWNER_ID = 711427177
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
