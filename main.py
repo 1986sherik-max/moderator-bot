@@ -13,9 +13,10 @@ dp = Dispatcher()
 
 # Linklarni aniqlash uchun
 LINK_PATTERN = re.compile(
-    r"(https?://|www\.|t.me|T.me|.ru|.com|.uz|telegram.me|t\.me/|telegram\.me/|@\w+)",
+    r"(https?://|www\.|t\.me/|telegram\.me/|@\w+|\b\S+\.(ru|com|uz)\b)",
     re.IGNORECASE
 )
+
 BLACKLIST = [
     "minet",
     "porno",
@@ -25,7 +26,7 @@ BLACKLIST = [
     "jalab",
     "jallab",
     "kot",
-     "am",
+    "am",
     "aminga",
     "suka",
     "dalbayop",
@@ -39,7 +40,6 @@ BLACKLIST = [
 async def start(message: Message):
     await message.answer("🛡 Moderator Bot ishga tushdi!")
 
-
 @dp.message(F.text)
 async def check_links(message: Message):
     # Guruhdan tashqarida ishlamasin
@@ -51,21 +51,23 @@ async def check_links(message: Message):
 
     if member.status in ("administrator", "creator"):
         return
-text = message.text.lower()
 
-for word in BLACKLIST:
-    if word in text:
-        await message.delete()
+    text = message.text.lower()
 
-        msg = await message.answer(
-            f"🚫 {message.from_user.full_name}, taqiqlangan so'z ishlatdingiz!"
-        )
+    # Qora ro'yxatdagi so'zlarni tekshirish
+    for word in BLACKLIST:
+        if word in text:
+            await message.delete()
 
-        await asyncio.sleep(15)
-        await msg.delete()
-        return
-        
-        # Link topilsa
+            msg = await message.answer(
+                f"🚫 {message.from_user.full_name}, taqiqlangan so'z ishlatdingiz!"
+            )
+
+            await asyncio.sleep(15)
+            await msg.delete()
+            return
+
+    # Link topilsa
     if LINK_PATTERN.search(message.text):
         await message.delete()
 
@@ -74,13 +76,10 @@ for word in BLACKLIST:
         )
 
         await asyncio.sleep(15)
-
         await msg.delete()
-
 
 async def main():
     await dp.start_polling(bot)
-
 
 if __name__ == "__main__":
     asyncio.run(main())
