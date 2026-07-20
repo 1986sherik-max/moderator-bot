@@ -35,17 +35,17 @@ async def check_links(message: Message):
     if member.status in ("administrator", "creator"):
         return
 
-    # Link topilsa
+        # Link topilsa
     if LINK_PATTERN.search(message.text):
-    await message.delete()
+        await message.delete()
 
-    msg = await message.answer(
-        f"🚫 {message.from_user.full_name}, guruhda link yuborish taqiqlangan!"
-    )
+        msg = await message.answer(
+            f"🚫 {message.from_user.full_name}, guruhda link yuborish taqiqlangan!"
+        )
 
-    await asyncio.sleep(15)
+        await asyncio.sleep(15)
 
-    await msg.delete()
+        await msg.delete()
 
 
 async def main():
