@@ -8,7 +8,7 @@ from aiogram.types import Message
 
 TOKEN = os.getenv("BOT_TOKEN")
 OWNER_ID = 711427177
-
+TARGET_CHAT_ID = -5153035696
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
