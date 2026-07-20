@@ -8,11 +8,7 @@ from aiogram.types import Message
 
 TOKEN = os.getenv("BOT_TOKEN")
 OWNER_ID = 711427177
-ALLOWED_GROUPS = {
-    -5153035696,
-    -1002222222222,
-    -1003333333333,
-}
+
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
@@ -68,10 +64,7 @@ async def check_links(message: Message):
     # Guruhdan tashqarida ishlamasin
     if message.chat.type not in ("group", "supergroup"):
         return
-         # Faqat ruxsat berilgan guruhlarda ishlasin
-    if message.chat.id not in ALLOWED_GROUPS:
-        return
-
+         
     # Yangi guruh haqida faqat bir marta xabar berish
     if message.chat.id not in KNOWN_GROUPS:
         KNOWN_GROUPS.add(message.chat.id)
