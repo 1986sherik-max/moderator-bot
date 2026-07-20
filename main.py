@@ -1,27 +1,31 @@
 import asyncio
 import os
 import re
+import asyncpg
 
 from aiogram import Bot, Dispatcher, F
 from aiogram.filters import Command
-from aiogram.types import Message
+from aiogram.types import Message, ChatMemberUpdated
+
 
 TOKEN = os.getenv("BOT_TOKEN")
+DATABASE_URL = os.getenv("DATABASE_URL")
+
 OWNER_ID = 711427177
-TARGET_CHAT_ID = -5153035696
+
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
-# Faqat bir marta xabar yuborish uchun
-KNOWN_USERS = set()
-KNOWN_GROUPS = set()
 
-# Linklarni aniqlash uchun
+pool = None
+
+
 LINK_PATTERN = re.compile(
     r"(https?://|www\.|t\.me|telegram\.me|@\w+|[a-zA-Z0-9_-]+\.(ru|com|uz))",
     re.IGNORECASE
 )
+
 
 BLACKLIST = [
     "minet",
@@ -41,79 +45,236 @@ BLACKLIST = [
     "qotagim",
 ]
 
+
+# ---------------- DATABASE ----------------
+
+async def init_db():
+
+    global pool
+
+    pool = await asyncpg.create_pool(DATABASE_URL)
+
+
+    async with pool.acquire() as db:
+
+        await db.execute("""
+        CREATE TABLE IF NOT EXISTS users(
+            user_id BIGINT PRIMARY KEY,
+            full_name TEXT,
+            username TEXT
+        )
+        """)
+
+
+        await db.execute("""
+        CREATE TABLE IF NOT EXISTS groups(
+            chat_id BIGINT PRIMARY KEY,
+            title TEXT
+        )
+        """)
+
+
+
+async def save_user(user):
+
+    async with pool.acquire() as db:
+
+        await db.execute("""
+        INSERT INTO users
+        VALUES($1,$2,$3)
+        ON CONFLICT(user_id)
+        DO NOTHING
+        """,
+        user.id,
+        user.full_name,
+        user.username
+        )
+
+
+
+async def save_group(chat):
+
+    async with pool.acquire() as db:
+
+        result = await db.fetchrow(
+            "SELECT chat_id FROM groups WHERE chat_id=$1",
+            chat.id
+        )
+
+
+        if not result:
+
+            await db.execute("""
+            INSERT INTO groups
+            VALUES($1,$2)
+            """,
+            chat.id,
+            chat.title
+            )
+
+            return True
+
+    return False
+
+
+
+# ---------------- BOT START ----------------
+
+
 @dp.message(Command("start"))
 async def start(message: Message):
-    await message.answer("🛡 Moderator Bot ishga tushdi!")
+
+    await save_user(message.from_user)
+
+
+    await message.answer(
+        "🛡 Moderator Bot ishga tushdi!"
+    )
+
 
     if message.chat.type == "private":
-        if message.from_user.id not in KNOWN_USERS:
-            KNOWN_USERS.add(message.from_user.id)
 
-            await bot.send_message(
-                OWNER_ID,
-                f"""🆕 Yangi foydalanuvchi
+        await bot.send_message(
+            OWNER_ID,
+            f"""
+🆕 Yangi foydalanuvchi
 
 👤 Ism: {message.from_user.full_name}
 🆔 ID: {message.from_user.id}
-📛 Username: @{message.from_user.username if message.from_user.username else "yo'q"}"""
+📛 Username: @{message.from_user.username or 'yo‘q'}
+"""
+        )
+
+
+
+# ---------------- BOT GROUP JOIN ----------------
+
+
+@dp.my_chat_member()
+async def bot_added(event: ChatMemberUpdated):
+
+
+    if event.chat.type not in ("group","supergroup"):
+        return
+
+
+
+    if event.new_chat_member.status in (
+        "member",
+        "administrator"
+    ):
+
+        new = await save_group(event.chat)
+
+
+        if new:
+
+            await bot.send_message(
+                OWNER_ID,
+                f"""
+🆕 Bot yangi guruhga qo‘shildi
+
+👥 Guruh: {event.chat.title}
+
+🆔 ID:
+{event.chat.id}
+"""
             )
+
+
+
+# ---------------- MODERATOR ----------------
 
 
 @dp.message(F.text)
 async def check_links(message: Message):
-    # Guruhdan tashqarida ishlamasin
-    if message.chat.type not in ("group", "supergroup"):
+
+
+    if message.chat.type not in (
+        "group",
+        "supergroup"
+    ):
         return
-         
-    # Yangi guruh haqida faqat bir marta xabar berish
-    if message.chat.id not in KNOWN_GROUPS:
-        KNOWN_GROUPS.add(message.chat.id)
 
-        await bot.send_message(
-            OWNER_ID,
-            f"""🆕 Bot yangi guruhga qo'shildi
 
-👥 Guruh: {message.chat.title}
-🆔 Chat ID: {message.chat.id}"""
-        )
 
-    # Adminlarni tekshirish
-    member = await bot.get_chat_member(message.chat.id, message.from_user.id)
+    await save_user(message.from_user)
 
-    if member.status in ("administrator", "creator"):
+
+    member = await bot.get_chat_member(
+        message.chat.id,
+        message.from_user.id
+    )
+
+
+    if member.status in (
+        "administrator",
+        "creator"
+    ):
         return
+
+
 
     text = message.text.lower()
-    clean_text = re.sub(r"\s+", "", text)
 
-    # Qora ro'yxatdagi so'zlarni tekshirish
+    clean_text = re.sub(
+        r"\s+",
+        "",
+        text
+    )
+
+
+
     for word in BLACKLIST:
+
         if word in text:
+
+
             await message.delete()
 
+
             msg = await message.answer(
-                f"🚫 {message.from_user.full_name}, taqiqlangan so'z ishlatdingiz!"
+                f"🚫 {message.from_user.full_name}, taqiqlangan so'z!"
             )
 
+
             await asyncio.sleep(5)
+
             await msg.delete()
+
             return
 
-    # Link topilsa
+
+
     if LINK_PATTERN.search(clean_text):
+
+
         await message.delete()
 
+
         msg = await message.answer(
-            f"🚫 {message.from_user.full_name}, guruhda link yuborish taqiqlangan!"
+            f"🚫 {message.from_user.full_name}, link yuborish taqiqlangan!"
         )
 
+
         await asyncio.sleep(5)
+
         await msg.delete()
 
 
+
+
+# ---------------- RUN ----------------
+
+
 async def main():
+
+    await init_db()
+
     await dp.start_polling(bot)
 
 
+
 if __name__ == "__main__":
+
     asyncio.run(main())
