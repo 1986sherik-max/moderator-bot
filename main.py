@@ -63,7 +63,7 @@ async def check_links(message: Message):
                 f"🚫 {message.from_user.full_name}, taqiqlangan so'z ishlatdingiz!"
             )
 
-            await asyncio.sleep(15)
+            await asyncio.sleep(7)
             await msg.delete()
             return
 
