@@ -51,7 +51,20 @@ async def check_links(message: Message):
 
     if member.status in ("administrator", "creator"):
         return
+text = message.text.lower()
 
+for word in BLACKLIST:
+    if word in text:
+        await message.delete()
+
+        msg = await message.answer(
+            f"🚫 {message.from_user.full_name}, taqiqlangan so'z ishlatdingiz!"
+        )
+
+        await asyncio.sleep(15)
+        await msg.delete()
+        return
+        
         # Link topilsa
     if LINK_PATTERN.search(message.text):
         await message.delete()
