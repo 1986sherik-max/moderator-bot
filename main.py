@@ -13,7 +13,7 @@ dp = Dispatcher()
 
 # Linklarni aniqlash uchun
 LINK_PATTERN = re.compile(
-    r"(https?://|www\.|t\.me/|telegram\.me/|@\w+|\b\S+\.(ru|com|uz)\b)",
+    r"(https?://|www\.|t\.me|telegram\.me|@\w+|[a-zA-Z0-9_-]+\.(ru|com|uz))",
     re.IGNORECASE
 )
 
@@ -69,6 +69,7 @@ async def check_links(message: Message):
         return
 
     text = message.text.lower()
+clean_text = re.sub(r"\s+", "", text)
 
     # Qora ro'yxatdagi so'zlarni tekshirish
     for word in BLACKLIST:
@@ -84,7 +85,7 @@ async def check_links(message: Message):
             return
 
     # Link topilsa
-    if LINK_PATTERN.search(message.text):
+    if LINK_PATTERN.search(clean_text):
         await message.delete()
 
         msg = await message.answer(
