@@ -78,7 +78,7 @@ async def save_user(user):
     async with pool.acquire() as db:
 
         await db.execute("""
-        INSERT INTO users
+        INSERT INTO users(user_id, full_name, username)
         VALUES($1,$2,$3)
         ON CONFLICT(user_id)
         DO NOTHING
@@ -94,16 +94,16 @@ async def save_group(chat):
 
     async with pool.acquire() as db:
 
-        check = await db.fetchrow(
+        old = await db.fetchrow(
             "SELECT chat_id FROM groups WHERE chat_id=$1",
             chat.id
         )
 
 
-        if not check:
+        if not old:
 
             await db.execute("""
-            INSERT INTO groups
+            INSERT INTO groups(chat_id,title)
             VALUES($1,$2)
             """,
             chat.id,
@@ -112,5 +112,243 @@ async def save_group(chat):
 
             return True
 
-
     return False
+
+
+
+# ================= START =================
+
+
+@dp.message(Command("start"))
+async def start(message: Message):
+
+    await save_user(message.from_user)
+
+    await message.answer(
+        "🛡 Moderator Bot ishga tushdi!"
+    )
+
+
+    if message.chat.type == "private":
+
+        await bot.send_message(
+            OWNER_ID,
+            f"""
+🆕 Yangi foydalanuvchi
+
+👤 Ism: {message.from_user.full_name}
+🆔 ID: {message.from_user.id}
+📛 Username: @{message.from_user.username or "yo'q"}
+"""
+        )
+
+
+
+# ================= BOT GURUHGA QO'SHILGANDA =================
+
+
+@dp.my_chat_member()
+async def bot_added(event: ChatMemberUpdated):
+
+    if event.chat.type not in ("group", "supergroup"):
+        return
+
+
+    if event.new_chat_member.status in (
+        "member",
+        "administrator"
+    ):
+
+        new = await save_group(event.chat)
+
+
+        if new:
+
+            await bot.send_message(
+                OWNER_ID,
+                f"""
+🆕 Bot yangi guruhga qo'shildi
+
+👥 Guruh:
+{event.chat.title}
+
+🆔 ID:
+{event.chat.id}
+"""
+            )
+
+
+
+# ================= ELON =================
+
+
+@dp.message(Command("elon"))
+async def send_elon(message: Message):
+
+    if message.from_user.id != OWNER_ID:
+        return
+
+
+    text = message.text.replace("/elon", "").strip()
+
+
+    if not text:
+
+        await message.answer(
+            "❌ Misol:\n\n"
+            "/elon Assalomu alaykum!"
+        )
+
+        return
+
+
+
+    async with pool.acquire() as db:
+
+        groups = await db.fetch(
+            "SELECT chat_id FROM groups"
+        )
+
+
+    ok = 0
+    error = 0
+
+
+    for group in groups:
+
+        try:
+
+            await bot.send_message(
+                group["chat_id"],
+                text
+            )
+
+            ok += 1
+
+
+        except Exception:
+
+            error += 1
+
+
+
+    await message.answer(
+        f"""
+✅ Yuborildi
+
+📢 Guruhlar: {ok}
+❌ Xato: {error}
+"""
+    )
+
+
+
+# ================= MODERATOR =================
+
+
+@dp.message(F.text)
+async def moderator(message: Message):
+
+    if message.chat.type not in (
+        "group",
+        "supergroup"
+    ):
+        return
+
+
+    # Har qanday guruhni saqlash
+    new = await save_group(message.chat)
+
+
+    if new:
+
+        await bot.send_message(
+            OWNER_ID,
+            f"""
+🆕 Yangi guruh aniqlandi
+
+👥 {message.chat.title}
+
+🆔 {message.chat.id}
+"""
+        )
+
+
+    await save_user(message.from_user)
+
+
+
+    member = await bot.get_chat_member(
+        message.chat.id,
+        message.from_user.id
+    )
+
+
+    if member.status in (
+        "administrator",
+        "creator"
+    ):
+        return
+
+
+
+    text = message.text.lower()
+
+
+    clean = re.sub(
+        r"\s+",
+        "",
+        text
+    )
+
+
+    for word in BLACKLIST:
+
+        if word in text:
+
+            await message.delete()
+
+
+            warn = await message.answer(
+                f"🚫 {message.from_user.full_name}, taqiqlangan so'z!"
+            )
+
+
+            await asyncio.sleep(5)
+
+            await warn.delete()
+
+            return
+
+
+
+    if LINK_PATTERN.search(clean):
+
+        await message.delete()
+
+
+        warn = await message.answer(
+            f"🚫 {message.from_user.full_name}, link yuborish mumkin emas!"
+        )
+
+
+        await asyncio.sleep(5)
+
+        await warn.delete()
+
+
+
+# ================= RUN =================
+
+
+async def main():
+
+    await init_db()
+
+    await dp.start_polling(bot)
+
+
+
+if __name__ == "__main__":
+
+    asyncio.run(main())
