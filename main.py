@@ -26,7 +26,6 @@ BLACKLIST = [
     "jalab",
     "jallab",
     "kot",
-    "am",
     "aminga",
     "suka",
     "dalbayop",
@@ -34,22 +33,6 @@ BLACKLIST = [
     "pidaraz",
     "ami",
     "qotagim",
-       "Minet",
-    "Porno",
-    "Kotmisan",
-    "Nastroy",
-    "Am",
-    "Jalab",
-    "Jallab",
-    "Kot",
-    "Am",
-    "Aminga",
-    "Suka",
-    "Dalbayop",
-    "Suchara",
-    "Pidaraz",
-    "Ami",
-    "Qotagim",
 ]
 
 @dp.message(Command("start"))
@@ -69,7 +52,7 @@ async def check_links(message: Message):
         return
 
     text = message.text.lower()
-clean_text = re.sub(r"\s+", "", text)
+    clean_text = re.sub(r"\s+", "", text)
 
     # Qora ro'yxatdagi so'zlarni tekshirish
     for word in BLACKLIST:
