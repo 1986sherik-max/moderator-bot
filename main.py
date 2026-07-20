@@ -239,7 +239,7 @@ async def send_elon(message: Message):
         f"""
 ✅ E'lon yuborildi
 
-📢 Guruhlar: {success} -5153035696
+📢 Guruhlar: {success}
 ❌ Xato: {failed}
 """
     )
