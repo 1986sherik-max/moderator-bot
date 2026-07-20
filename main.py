@@ -17,7 +17,6 @@ OWNER_ID = 711427177
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
-
 pool = None
 
 
@@ -32,7 +31,6 @@ BLACKLIST = [
     "porno",
     "kotmisan",
     "bukmeker",
-    "am",
     "jalab",
     "jallab",
     "kot",
@@ -46,7 +44,8 @@ BLACKLIST = [
 ]
 
 
-# ---------------- DATABASE ----------------
+# ================= DATABASE =================
+
 
 async def init_db():
 
@@ -80,7 +79,7 @@ async def save_user(user):
     async with pool.acquire() as db:
 
         await db.execute("""
-        INSERT INTO users
+        INSERT INTO users(user_id, full_name, username)
         VALUES($1,$2,$3)
         ON CONFLICT(user_id)
         DO NOTHING
@@ -96,16 +95,16 @@ async def save_group(chat):
 
     async with pool.acquire() as db:
 
-        result = await db.fetchrow(
+        old = await db.fetchrow(
             "SELECT chat_id FROM groups WHERE chat_id=$1",
             chat.id
         )
 
 
-        if not result:
+        if not old:
 
             await db.execute("""
-            INSERT INTO groups
+            INSERT INTO groups(chat_id,title)
             VALUES($1,$2)
             """,
             chat.id,
@@ -114,11 +113,12 @@ async def save_group(chat):
 
             return True
 
+
     return False
 
 
 
-# ---------------- BOT START ----------------
+# ================= START =================
 
 
 @dp.message(Command("start"))
@@ -141,22 +141,20 @@ async def start(message: Message):
 
 👤 Ism: {message.from_user.full_name}
 🆔 ID: {message.from_user.id}
-📛 Username: @{message.from_user.username or 'yo‘q'}
+📛 Username: @{message.from_user.username or "yo'q"}
 """
         )
 
 
 
-# ---------------- BOT GROUP JOIN ----------------
+# ================= GROUP ANIQLASH =================
 
 
 @dp.my_chat_member()
 async def bot_added(event: ChatMemberUpdated):
 
-
-    if event.chat.type not in ("group","supergroup"):
+    if event.chat.type not in ("group", "supergroup"):
         return
-
 
 
     if event.new_chat_member.status in (
@@ -172,7 +170,7 @@ async def bot_added(event: ChatMemberUpdated):
             await bot.send_message(
                 OWNER_ID,
                 f"""
-🆕 Bot yangi guruhga qo‘shildi
+🆕 Bot yangi guruhga qo'shildi
 
 👥 Guruh: {event.chat.title}
 
@@ -183,12 +181,76 @@ async def bot_added(event: ChatMemberUpdated):
 
 
 
-# ---------------- MODERATOR ----------------
+# ================= ELON YUBORISH =================
+
+
+@dp.message(Command("elon"))
+async def send_elon(message: Message):
+
+    if message.from_user.id != OWNER_ID:
+        return
+
+
+    text = message.text.replace("/elon", "").strip()
+
+
+    if not text:
+
+        await message.answer(
+            "❌ E'lon yozing:\n\n"
+            "/elon Salom hammaga!"
+        )
+
+        return
+
+
+
+    async with pool.acquire() as db:
+
+        groups = await db.fetch(
+            "SELECT chat_id FROM groups"
+        )
+
+
+
+    success = 0
+    failed = 0
+
+
+    for group in groups:
+
+        try:
+
+            await bot.send_message(
+                group["chat_id"],
+                text
+            )
+
+            success += 1
+
+
+        except Exception:
+
+            failed += 1
+
+
+
+    await message.answer(
+        f"""
+✅ E'lon yuborildi
+
+📢 Guruhlar: {success}
+❌ Xato: {failed}
+"""
+    )
+
+
+
+# ================= MODERATOR =================
 
 
 @dp.message(F.text)
 async def check_links(message: Message):
-
 
     if message.chat.type not in (
         "group",
@@ -197,8 +259,8 @@ async def check_links(message: Message):
         return
 
 
-
     await save_user(message.from_user)
+
 
 
     member = await bot.get_chat_member(
@@ -217,6 +279,7 @@ async def check_links(message: Message):
 
     text = message.text.lower()
 
+
     clean_text = re.sub(
         r"\s+",
         "",
@@ -228,7 +291,6 @@ async def check_links(message: Message):
     for word in BLACKLIST:
 
         if word in text:
-
 
             await message.delete()
 
@@ -248,7 +310,6 @@ async def check_links(message: Message):
 
     if LINK_PATTERN.search(clean_text):
 
-
         await message.delete()
 
 
@@ -263,8 +324,7 @@ async def check_links(message: Message):
 
 
 
-
-# ---------------- RUN ----------------
+# ================= RUN =================
 
 
 async def main():
