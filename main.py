@@ -68,6 +68,9 @@ async def check_links(message: Message):
     # Guruhdan tashqarida ishlamasin
     if message.chat.type not in ("group", "supergroup"):
         return
+         # Faqat ruxsat berilgan guruhlarda ishlasin
+    if message.chat.id not in ALLOWED_GROUPS:
+        return
 
     # Yangi guruh haqida faqat bir marta xabar berish
     if message.chat.id not in KNOWN_GROUPS:
