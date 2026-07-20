@@ -8,6 +8,11 @@ from aiogram.types import Message
 
 TOKEN = os.getenv("BOT_TOKEN")
 OWNER_ID = 711427177
+ALLOWED_GROUPS = {
+    -1001111111111,
+    -1002222222222,
+    -1003333333333,
+}
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
