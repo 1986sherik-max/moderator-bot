@@ -13,7 +13,7 @@ dp = Dispatcher()
 
 # Linklarni aniqlash uchun
 LINK_PATTERN = re.compile(
-    r"(https?://|www\.|t\.me/|telegram\.me/|@\w+)",
+    r"(https?://|www\.|t.me|t\.me/|telegram\.me/|@\w+)",
     re.IGNORECASE
 )
 
