@@ -16,7 +16,24 @@ LINK_PATTERN = re.compile(
     r"(https?://|www\.|t.me|T.me|.ru|.com|.uz|telegram.me|t\.me/|telegram\.me/|@\w+)",
     re.IGNORECASE
 )
-
+BLACKLIST = [
+    "minet",
+    "porno",
+    "kotmisan",
+    "bukmeker",
+    "am",
+    "jalab",
+    "jallab",
+    "kot",
+     "am",
+    "aminga",
+    "suka",
+    "dalbayop",
+    "suchara",
+    "pidaraz",
+    "ami",
+    "qotagim",
+]
 
 @dp.message(Command("start"))
 async def start(message: Message):
