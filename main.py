@@ -310,7 +310,7 @@ async def delete_service_messages(message: Message):
     except:
         pass
 
-   # ================= MODERATOR =================
+# ================= MODERATOR =================
 
 
 @dp.message(F.text)
