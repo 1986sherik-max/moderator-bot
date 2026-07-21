@@ -2,7 +2,7 @@ import asyncio
 import os
 import re
 import asyncpg
-last_message = {}
+
 from aiogram import Bot, Dispatcher, F
 from aiogram.filters import Command
 from aiogram.types import Message, ChatMemberUpdated
@@ -21,7 +21,7 @@ pool = None
 
 
 LINK_PATTERN = re.compile(
-    r"(https?://|www\.|t\.me|t.me|telegram\.me|@\w+|[a-zA-Z0-9_-]+\.(ru|com|uz))",
+    r"(https?://|www\.|t\.me|telegram\.me|@\w+|[a-zA-Z0-9_-]+\.(ru|com|uz))",
     re.IGNORECASE
 )
 
@@ -292,23 +292,7 @@ async def media_elon(message: Message):
 
     await send_to_groups(message)
 
-# ================= XIZMAT XABARLARINI O'CHIRISH =================
 
-@dp.message(
-    F.new_chat_members |
-    F.left_chat_member
-)
-async def delete_service_messages(message: Message):
-
-    if message.chat.type not in ("group", "supergroup"):
-        return
-
-    await asyncio.sleep(5)
-
-    try:
-        await message.delete()
-    except:
-        pass
 
 # ================= MODERATOR =================
 
@@ -322,8 +306,10 @@ async def moderator(message: Message):
     ):
         return
 
+
     # Har qanday guruhni saqlash
     new = await save_group(message.chat)
+
 
     if new:
 
@@ -338,12 +324,16 @@ async def moderator(message: Message):
 """
         )
 
+
     await save_user(message.from_user)
+
+
 
     member = await bot.get_chat_member(
         message.chat.id,
         message.from_user.id
     )
+
 
     if member.status in (
         "administrator",
@@ -351,44 +341,17 @@ async def moderator(message: Message):
     ):
         return
 
+
+
     text = message.text.lower()
+
 
     clean = re.sub(
         r"\s+",
         "",
         text
     )
-    # ================= KETMA-KET BIR XIL XABAR =================
 
-    chat_id = message.chat.id
-
-    previous = last_message.get(chat_id)
-    print("OLD:", previous)
-print("NEW:", (message.from_user.id, clean))
-
-    # Hozirgi xabarni keyinroq saqlaymiz
-    if previous is not None:
-        if (
-            previous["user_id"] == message.from_user.id
-            and previous["text"] == clean
-        ):
-            await message.delete()
-
-            warn = await message.answer(
-                f"🚫 {message.from_user.full_name}, hammayoni spam qivordizu! 🤦‍♂️"
-            )
-
-            await asyncio.sleep(7)
-            await warn.delete()
-            return
-
-    # Faqat xabar spam bo'lmasa oxirgi xabarni yangilaymiz
-    last_message[chat_id] = {
-        "user_id": message.from_user.id,
-        "text": clean
-    }
-
-    # ================= QORA RO'YXAT =================
 
     for word in BLACKLIST:
 
@@ -396,15 +359,35 @@ print("NEW:", (message.from_user.id, clean))
 
             await message.delete()
 
+
             warn = await message.answer(
                 f"🚫 {message.from_user.full_name}, kopkotta odam uyalmismi shuni yozgani?"
             )
+
 
             await asyncio.sleep(7)
 
             await warn.delete()
 
             return
+
+
+
+    if LINK_PATTERN.search(clean):
+
+        await message.delete()
+
+
+        warn = await message.answer(
+            f"🚫 {message.from_user.full_name}, uyalmasdan link tashadiza?"
+        )
+
+
+        await asyncio.sleep(7)
+
+        await warn.delete()
+
+
 
 # ================= RUN =================
 
@@ -416,6 +399,7 @@ async def main():
     await dp.start_polling(bot)
 
 
+
 if __name__ == "__main__":
 
-    asyncio.run(main())
+    asyncio.run(main())     shu kodni ozgartirib qayta jonat
