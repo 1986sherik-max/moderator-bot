@@ -392,7 +392,9 @@ async def moderator(message: Message):
         message.from_user.id,
         clean
     )
-
+    
+# ================= QORA RO'YXAT =================
+    
     for word in BLACKLIST:
 
         if word in text:
