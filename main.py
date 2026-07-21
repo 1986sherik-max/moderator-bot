@@ -343,47 +343,46 @@ async def moderator(message: Message):
     text = message.text.lower().strip()
 
     # Ketma-ket bir xil xabarlarni o'chirish
-chat_id = message.chat.id
-user_id = message.from_user.id
+    chat_id = message.chat.id
+    user_id = message.from_user.id
 
-last = last_chat_message.get(chat_id)
+    last = last_chat_message.get(chat_id)
 
-if last and last["user_id"] == user_id and last["text"] == text:
+    if last and last["user_id"] == user_id and last["text"] == text:
 
-    key = (chat_id, user_id)
-    repeat_count[key] = repeat_count.get(key, 0) + 1
+        key = (chat_id, user_id)
+        repeat_count[key] = repeat_count.get(key, 0) + 1
 
-    await message.delete()
+        await message.delete()
 
-    if repeat_count[key] == 1:
+        if repeat_count[key] == 1:
 
-        warn = await message.answer(
-            f"🚫 {message.from_user.full_name}, bir xil xabarni ketma-ket yubormang!"
-        )
+            warn = await message.answer(
+                f"🚫 {message.from_user.full_name}, bir xil xabarni ketma-ket yubormang!"
+            )
 
-        await asyncio.sleep(7)
+            await asyncio.sleep(7)
 
-        try:
-            await warn.delete()
-        except:
-            pass
+            try:
+                await warn.delete()
+            except:
+                pass
 
-    return
+        return
 
-# Oxirgi xabarni eslab qolish
-last_chat_message[chat_id] = {
-    "user_id": user_id,
-    "text": text
-}
+    # Oxirgi xabarni eslab qolish
+    last_chat_message[chat_id] = {
+        "user_id": user_id,
+        "text": text
+    }
 
-repeat_count[(chat_id, user_id)] = 0
+    repeat_count[(chat_id, user_id)] = 0
 
     clean = re.sub(
         r"\s+",
         "",
         text
     )
-
     for word in BLACKLIST:
 
         if word in text:
