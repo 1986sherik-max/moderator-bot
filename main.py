@@ -411,7 +411,7 @@ async def moderator(message: Message):
             await message.delete()
 
             warn = await message.answer(
-                f"🚫 {message.from_user.full_name}, ko'pkotta odam uyalmismi shuni yozgani?"
+                f"🚫 {message.from_user.full_name}, kopkotta odam uyalmismi shuni yozgani?"
             )
 
             await asyncio.sleep(7)
