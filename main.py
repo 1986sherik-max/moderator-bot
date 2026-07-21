@@ -94,25 +94,17 @@ async def save_group(chat):
 
     async with pool.acquire() as db:
 
-        old = await db.fetchrow(
-            "SELECT chat_id FROM groups WHERE chat_id=$1",
-            chat.id
+        result = await db.execute("""
+            INSERT INTO groups(chat_id, title)
+            VALUES($1, $2)
+            ON CONFLICT (chat_id)
+            DO NOTHING
+        """,
+        chat.id,
+        chat.title
         )
 
-
-        if not old:
-
-            await db.execute("""
-            INSERT INTO groups(chat_id,title)
-            VALUES($1,$2)
-            """,
-            chat.id,
-            chat.title
-            )
-
-            return True
-
-    return False
+        return result == "INSERT 0 1"
 
 
 
