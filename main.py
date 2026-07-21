@@ -299,7 +299,6 @@ async def media_elon(message: Message):
 
 # ================= MODERATOR =================
 
-
 @dp.message(F.text)
 async def moderator(message: Message):
 
@@ -309,13 +308,10 @@ async def moderator(message: Message):
     ):
         return
 
-
     # Har qanday guruhni saqlash
     new = await save_group(message.chat)
 
-
     if new:
-
         await bot.send_message(
             OWNER_ID,
             f"""
@@ -327,16 +323,12 @@ async def moderator(message: Message):
 """
         )
 
-
     await save_user(message.from_user)
-
-
 
     member = await bot.get_chat_member(
         message.chat.id,
         message.from_user.id
     )
-
 
     if member.status in (
         "administrator",
@@ -344,79 +336,67 @@ async def moderator(message: Message):
     ):
         return
 
+    text = message.text.lower().strip()
 
+    # Ketma-ket bir xil xabarlarni o'chirish
+    chat_id = message.chat.id
+    user_id = message.from_user.id
 
-text = message.text.lower().strip()
+    key = (chat_id, user_id)
 
-# Ketma-ket bir xil xabarlarni o'chirish
-chat_id = message.chat.id
-user_id = message.from_user.id
+    if key in last_message:
+        old_text, old_message_id = last_message[key]
 
-key = (chat_id, user_id)
+        if (
+            old_text == text
+            and message.message_id == old_message_id + 1
+        ):
+            await message.delete()
 
-if key in last_message:
-    old_text, old_message_id = last_message[key]
+            warn = await message.answer(
+                f"🚫 {message.from_user.full_name}, bir xil xabarni ketma-ket yubormang!"
+            )
 
-    if (
-        old_text == text
-        and message.message_id == old_message_id + 1
-    ):
-        await message.delete()
+            await asyncio.sleep(7)
+            await warn.delete()
+            return
 
-        warn = await message.answer(
-            f"🚫 {message.from_user.full_name}, bir xil xabarni ketma-ket yubormang!"
-        )
+    last_message[key] = (
+        text,
+        message.message_id
+    )
 
-        await asyncio.sleep(7)
-        await warn.delete()
-        return
+    clean = re.sub(
+        r"\s+",
+        "",
+        text
+    )
 
-last_message[key] = (
-    text,
-    message.message_id
-)
-
-clean = re.sub(
-    r"\s+",
-    "",
-    text
-)
-
-
- for word in BLACKLIST:
+    for word in BLACKLIST:
 
         if word in text:
 
             await message.delete()
 
-
             warn = await message.answer(
                 f"🚫 {message.from_user.full_name}, kopkotta odam uyalmismi shuni yozgani?"
             )
 
-
             await asyncio.sleep(7)
-
             await warn.delete()
 
             return
-
-
 
     if LINK_PATTERN.search(clean):
 
         await message.delete()
 
-
         warn = await message.answer(
             f"🚫 {message.from_user.full_name}, uyalmasdan link tashadiza?"
         )
 
-
         await asyncio.sleep(7)
-
         await warn.delete()
-
 
 
 # ================= RUN =================
