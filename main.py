@@ -34,6 +34,8 @@ LINK_PATTERN = re.compile(
 
 
 BLACKLIST = [
+    "ам",
+    "am",
     "porno",
     "kotmisan",
     "bukmeker",
@@ -396,18 +398,18 @@ async def moderator(message: Message):
     )
     for word in BLACKLIST:
 
-        if word in text:
+    if re.search(rf"\b{re.escape(word)}\b", text, re.IGNORECASE):
 
-            await message.delete()
+        await message.delete()
 
-            warn = await message.answer(
-                f"🚫 {message.from_user.full_name}, kopkotta odam uyalmismi shuni yozgani?"
-            )
+        warn = await message.answer(
+            f"🚫 {message.from_user.full_name}, ko'pkotta odam uyalmaysizmi shuni yozgani?"
+        )
 
-            await asyncio.sleep(7)
-            await warn.delete()
+        await asyncio.sleep(7)
+        await warn.delete()
 
-            return
+        return
 
     if LINK_PATTERN.search(clean):
 
