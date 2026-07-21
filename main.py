@@ -397,7 +397,7 @@ async def moderator(message: Message):
         text
     )
     for word in BLACKLIST:
-        if re.search(rf"\b{re.escape(word)}\b", text, re.IGNORECASE):
+    if re.search(rf"\b{re.escape(word)}\b", text, re.IGNORECASE):
 
         await message.delete()
 
