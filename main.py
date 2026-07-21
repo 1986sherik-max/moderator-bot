@@ -391,12 +391,13 @@ async def moderator(message: Message):
 
     repeat_count[(chat_id, user_id)] = 0
 
-    clean = re.sub(
-        r"\s+",
-        "",
-        text
-    )
-    for word in BLACKLIST:
+clean = re.sub(
+    r"\s+",
+    "",
+    text
+)
+
+for word in BLACKLIST:
     if re.search(rf"\b{re.escape(word)}\b", text, re.IGNORECASE):
 
         await message.delete()
@@ -410,16 +411,16 @@ async def moderator(message: Message):
 
         return
 
-    if LINK_PATTERN.search(clean):
+if LINK_PATTERN.search(clean):
 
-        await message.delete()
+    await message.delete()
 
-        warn = await message.answer(
-            f"🚫 {message.from_user.full_name}, uyalmasdan link tashadiza?"
-        )
+    warn = await message.answer(
+        f"🚫 {message.from_user.full_name}, uyalmasdan link tashadiza?"
+    )
 
-        await asyncio.sleep(7)
-        await warn.delete()
+    await asyncio.sleep(7)
+    await warn.delete()
 
 
 # ================= RUN =================
