@@ -367,31 +367,39 @@ async def moderator(message: Message):
         "",
         text
     )
-       # ===== KETMA-KET BIR XIL XABAR SPAM =====
+# ================= KETMA-KET BIR XIL XABAR =================
 
-    chat_id = message.chat.id
+chat_id = message.chat.id
 
-    if chat_id in last_message:
-        last_user, last_text = last_message[chat_id]
+last_user = None
+last_text = None
 
-        if last_user == message.from_user.id and last_text == clean:
+if chat_id in last_message:
+    last_user, last_text = last_message[chat_id]
 
-            await message.delete()
+# Faqat ketma-ket bir xil xabar bo'lsa
+if (
+    last_user == message.from_user.id
+    and last_text == clean
+):
 
-            warn = await message.answer(
-                f"🚫 {message.from_user.full_name}, hammayoni spam qivordizu! 🤦‍♂️"
-            )
+    await message.delete()
 
-            await asyncio.sleep(7)
-
-            await warn.delete()
-
-            return
-
-    last_message[chat_id] = (
-        message.from_user.id,
-        clean
+    warn = await message.answer(
+        f"🚫 {message.from_user.full_name}, hammayoni spam qivordizu! 🤦‍♂️"
     )
+
+    await asyncio.sleep(7)
+
+    await warn.delete()
+
+    return
+
+# Oxirgi xabarni eslab qolamiz
+last_message[chat_id] = (
+    message.from_user.id,
+    clean
+)
     
 # ================= QORA RO'YXAT =================
     
