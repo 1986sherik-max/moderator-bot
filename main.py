@@ -41,19 +41,16 @@ BLACKLIST = [
     "pidaraz",
     "ami",
     "qotagim",
-       "minet",
-    "seks",
+     "seks",
     "sikihsamiz",
     "kotimga",
     "amimga",
     "oneni",
-    "qoto",
-    "sik",
+     "ski",
     "ам",
     "сикади",
     "жалаб",
-    "минет",
-    "анал",
+    "ски",
     "котогим",
 ]
 
@@ -131,7 +128,7 @@ async def start(message: Message):
     await save_user(message.from_user)
 
     await message.answer(
-        "🛡 Moderator Bot ishga tushdi!"
+        "Assalomu alaykum! 🛡 Moderator Bot ishga tushdi! Bot guruhingizni spam va uyatsiz so'zlardan tozalaydi. Bot yaxshi ishlashi uchun guruhda admin maqomini bering."
     )
 
 
@@ -364,11 +361,11 @@ async def moderator(message: Message):
 
 
             warn = await message.answer(
-                f"🚫 {message.from_user.full_name}, taqiqlangan so'z!"
+                f"🚫 {message.from_user.full_name}, kopkotta odam uyalmismi shuni yozgani?"
             )
 
 
-            await asyncio.sleep(5)
+            await asyncio.sleep(7)
 
             await warn.delete()
 
@@ -382,11 +379,11 @@ async def moderator(message: Message):
 
 
         warn = await message.answer(
-            f"🚫 {message.from_user.full_name}, link yuborish mumkin emas!"
+            f"🚫 {message.from_user.full_name}, uyalmasdan link tashadiza? !"
         )
 
 
-        await asyncio.sleep(5)
+        await asyncio.sleep(7)
 
         await warn.delete()
 
