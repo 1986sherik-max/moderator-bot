@@ -362,12 +362,13 @@ async def moderator(message: Message):
 
     chat_id = message.chat.id
 
-    last = last_message.get(chat_id)
+    previous = last_message.get(chat_id)
 
-    if last is not None:
+    # Hozirgi xabarni keyinroq saqlaymiz
+    if previous is not None:
         if (
-            last["user_id"] == message.from_user.id
-            and last["text"] == clean
+            previous["user_id"] == message.from_user.id
+            and previous["text"] == clean
         ):
             await message.delete()
 
@@ -379,7 +380,7 @@ async def moderator(message: Message):
             await warn.delete()
             return
 
-    # Oxirgi xabarni yangilaymiz
+    # Faqat xabar spam bo'lmasa oxirgi xabarni yangilaymiz
     last_message[chat_id] = {
         "user_id": message.from_user.id,
         "text": clean
