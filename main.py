@@ -379,7 +379,7 @@ async def moderator(message: Message):
 
 
         warn = await message.answer(
-            f"🚫 {message.from_user.full_name}, uyalmasdan link tashadiza? !"
+            f"🚫 {message.from_user.full_name}, uyalmasdan link tashadiza?"
         )
 
 
