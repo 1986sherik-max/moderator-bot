@@ -1,3 +1,4 @@
+
 import asyncio
 import os
 import re
@@ -392,16 +393,13 @@ async def moderator(message: Message):
     repeat_count[(chat_id, user_id)] = 0
 
     clean = re.sub(
-        r"[^a-zA-Zа-яА-Я0-9]+",
+        r"\s+",
         "",
-        text.lower()
+        text
     )
 
     for word in BLACKLIST:
-        if (
-            re.search(rf"\b{re.escape(word)}\b", text, re.IGNORECASE)
-            or word in clean
-        ):
+        if re.search(rf"\b{re.escape(word)}\b", text, re.IGNORECASE):
 
             await message.delete()
 
@@ -410,11 +408,7 @@ async def moderator(message: Message):
             )
 
             await asyncio.sleep(7)
-
-            try:
-                await warn.delete()
-            except:
-                pass
+            await warn.delete()
 
             return
 
@@ -427,11 +421,7 @@ async def moderator(message: Message):
         )
 
         await asyncio.sleep(7)
-
-        try:
-            await warn.delete()
-        except:
-            pass
+        await warn.delete()
 
 
 # ================= RUN =================
