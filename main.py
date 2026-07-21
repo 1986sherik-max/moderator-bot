@@ -396,24 +396,22 @@ if (
     return
 
 # Oxirgi xabarni eslab qolamiz
-last_message[chat_id] = (
-    message.from_user.id,
-    clean
-)
-    
-# ================= QORA RO'YXAT =================
-    
+    last_message[chat_id] = (
+        message.from_user.id,
+        clean
+    )
+
+    # ================= QORA RO'YXAT =================
+
     for word in BLACKLIST:
 
         if word in text:
 
             await message.delete()
 
-
             warn = await message.answer(
                 f"🚫 {message.from_user.full_name}, kopkotta odam uyalmismi shuni yozgani?"
             )
-
 
             await asyncio.sleep(7)
 
