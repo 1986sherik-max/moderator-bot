@@ -391,14 +391,13 @@ async def moderator(message: Message):
 
     repeat_count[(chat_id, user_id)] = 0
 
-    clean = re.sub(
-        r"\s+",
-        "",
-        text
-    )
+   clean = re.sub(
+    r"[^a-zA-Zа-яА-Я0-9]+",
+    "",
+    text.lower()
+)
 
-    for word in BLACKLIST:
-
+   for word in BLACKLIST:
     if (
         re.search(rf"\b{re.escape(word)}\b", text, re.IGNORECASE)
         or word in clean
