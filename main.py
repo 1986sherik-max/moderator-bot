@@ -19,6 +19,10 @@ dp = Dispatcher()
 
 pool = None
 
+# Anti-spam uchun
+last_chat_message = {}
+repeat_count = {}
+
 # Oxirgi xabarni saqlash
 last_message = {}
 
@@ -339,32 +343,40 @@ async def moderator(message: Message):
     text = message.text.lower().strip()
 
     # Ketma-ket bir xil xabarlarni o'chirish
-    chat_id = message.chat.id
-    user_id = message.from_user.id
+chat_id = message.chat.id
+user_id = message.from_user.id
+
+last = last_chat_message.get(chat_id)
+
+if last and last["user_id"] == user_id and last["text"] == text:
 
     key = (chat_id, user_id)
+    repeat_count[key] = repeat_count.get(key, 0) + 1
 
-    if key in last_message:
-        old_text, old_message_id = last_message[key]
+    await message.delete()
 
-        if (
-            old_text == text
-            and message.message_id == old_message_id + 1
-        ):
-            await message.delete()
+    if repeat_count[key] == 1:
 
-            warn = await message.answer(
-                f"🚫 {message.from_user.full_name}, bir xil xabarni ketma-ket yubormang!"
-            )
+        warn = await message.answer(
+            f"🚫 {message.from_user.full_name}, bir xil xabarni ketma-ket yubormang!"
+        )
 
-            await asyncio.sleep(7)
+        await asyncio.sleep(7)
+
+        try:
             await warn.delete()
-            return
+        except:
+            pass
 
-    last_message[key] = (
-        text,
-        message.message_id
-    )
+    return
+
+# Oxirgi xabarni eslab qolish
+last_chat_message[chat_id] = {
+    "user_id": user_id,
+    "text": text
+}
+
+repeat_count[(chat_id, user_id)] = 0
 
     clean = re.sub(
         r"\s+",
