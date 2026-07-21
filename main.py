@@ -322,10 +322,8 @@ async def moderator(message: Message):
     ):
         return
 
-
     # Har qanday guruhni saqlash
     new = await save_group(message.chat)
-
 
     if new:
 
@@ -340,16 +338,12 @@ async def moderator(message: Message):
 """
         )
 
-
     await save_user(message.from_user)
-
-
 
     member = await bot.get_chat_member(
         message.chat.id,
         message.from_user.id
     )
-
 
     if member.status in (
         "administrator",
@@ -357,10 +351,7 @@ async def moderator(message: Message):
     ):
         return
 
-
-
-
-   text = message.text.lower()
+    text = message.text.lower()
 
     clean = re.sub(
         r"\s+",
@@ -417,7 +408,7 @@ async def moderator(message: Message):
 
             await warn.delete()
 
-                  return
+            return
 
 
 # ================= RUN =================
