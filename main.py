@@ -346,7 +346,8 @@ async def moderator(message: Message):
 
 
 
-    text = message.text.lower()
+text = message.text.lower().strip()
+
 # Ketma-ket bir xil xabarlarni o'chirish
 chat_id = message.chat.id
 user_id = message.from_user.id
@@ -357,7 +358,7 @@ if key in last_message:
     old_text, old_message_id = last_message[key]
 
     if (
-        old_text == message.text.lower().strip()
+        old_text == text
         and message.message_id == old_message_id + 1
     ):
         await message.delete()
@@ -368,19 +369,18 @@ if key in last_message:
 
         await asyncio.sleep(7)
         await warn.delete()
-
         return
 
 last_message[key] = (
-    message.text.lower().strip(),
+    text,
     message.message_id
 )
 
-    clean = re.sub(
-        r"\s+",
-        "",
-        text
-    )
+clean = re.sub(
+    r"\s+",
+    "",
+    text
+)
 
 
     for word in BLACKLIST:
