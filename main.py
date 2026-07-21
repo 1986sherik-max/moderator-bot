@@ -360,20 +360,15 @@ async def moderator(message: Message):
     )
     # ================= KETMA-KET BIR XIL XABAR =================
 
-    chat_id = message.chat.id
+chat_id = message.chat.id
 
-    last_user = None
-    last_text = None
+last = last_message.get(chat_id)
 
-    if chat_id in last_message:
-        last_user, last_text = last_message[chat_id]
-
-    # Faqat ketma-ket bir xil xabar bo'lsa
+if last is not None:
     if (
-        last_user == message.from_user.id
-        and last_text == clean
+        last["user_id"] == message.from_user.id
+        and last["text"] == clean
     ):
-
         await message.delete()
 
         warn = await message.answer(
@@ -381,16 +376,14 @@ async def moderator(message: Message):
         )
 
         await asyncio.sleep(7)
-
         await warn.delete()
-
         return
 
-    # Oxirgi xabarni eslab qolamiz
-    last_message[chat_id] = (
-        message.from_user.id,
-        clean
-    )
+# Oxirgi xabarni yangilaymiz
+last_message[chat_id] = {
+    "user_id": message.from_user.id,
+    "text": clean
+}
 
     # ================= QORA RO'YXAT =================
 
