@@ -312,7 +312,6 @@ async def delete_service_messages(message: Message):
 
 # ================= MODERATOR =================
 
-
 @dp.message(F.text)
 async def moderator(message: Message):
 
@@ -326,7 +325,6 @@ async def moderator(message: Message):
     new = await save_group(message.chat)
 
     if new:
-
         await bot.send_message(
             OWNER_ID,
             f"""
@@ -358,17 +356,19 @@ async def moderator(message: Message):
         "",
         text
     )
+
     # ================= KETMA-KET BIR XIL XABAR =================
 
-chat_id = message.chat.id
+    chat_id = message.chat.id
 
-last = last_message.get(chat_id)
+    last = last_message.get(chat_id)
 
-if last is not None:
     if (
-        last["user_id"] == message.from_user.id
+        last is not None
+        and last["user_id"] == message.from_user.id
         and last["text"] == clean
     ):
+
         await message.delete()
 
         warn = await message.answer(
@@ -379,11 +379,11 @@ if last is not None:
         await warn.delete()
         return
 
-# Oxirgi xabarni yangilaymiz
-last_message[chat_id] = {
-    "user_id": message.from_user.id,
-    "text": clean
-}
+    # Oxirgi xabarni saqlaymiz
+    last_message[chat_id] = {
+        "user_id": message.from_user.id,
+        "text": clean
+    }
 
     # ================= QORA RO'YXAT =================
 
@@ -403,17 +403,18 @@ last_message[chat_id] = {
 
             return
 
+    # ================= LINK =================
 
-# ================= RUN =================
+    if LINK_PATTERN.search(clean):
 
+        await message.delete()
 
-async def main():
+        warn = await message.answer(
+            f"🚫 {message.from_user.full_name}, uyalmasdan link tashadiza?"
+        )
 
-    await init_db()
+        await asyncio.sleep(7)
 
-    await dp.start_polling(bot)
+        await warn.delete()
 
-
-if __name__ == "__main__":
-
-    asyncio.run(main())
+        return
