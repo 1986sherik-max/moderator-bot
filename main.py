@@ -195,20 +195,6 @@ async def send_elon(message: Message):
         return
 
 
-    text = message.text.replace("/elon", "").strip()
-
-
-    if not text:
-
-        await message.answer(
-            "❌ Misol:\n\n"
-            "/elon Assalomu alaykum!"
-        )
-
-        return
-
-
-
     async with pool.acquire() as db:
 
         groups = await db.fetch(
@@ -222,12 +208,55 @@ async def send_elon(message: Message):
 
     for group in groups:
 
+        chat_id = group["chat_id"]
+
+
         try:
 
-            await bot.send_message(
-                group["chat_id"],
-                text
-            )
+            # RASM
+            if message.photo:
+
+                await bot.send_photo(
+                    chat_id,
+                    photo=message.photo[-1].file_id,
+                    caption=message.caption
+                )
+
+
+            # VIDEO
+            elif message.video:
+
+                await bot.send_video(
+                    chat_id,
+                    video=message.video.file_id,
+                    caption=message.caption
+                )
+
+
+            # HUJJAT
+            elif message.document:
+
+                await bot.send_document(
+                    chat_id,
+                    document=message.document.file_id,
+                    caption=message.caption
+                )
+
+
+            # ODDIY MATN
+            elif message.text:
+
+                text = message.text.replace(
+                    "/elon",
+                    ""
+                ).strip()
+
+
+                await bot.send_message(
+                    chat_id,
+                    text
+                )
+
 
             ok += 1
 
@@ -240,7 +269,7 @@ async def send_elon(message: Message):
 
     await message.answer(
         f"""
-✅ Yuborildi
+✅ E'lon yuborildi
 
 📢 Guruhlar: {ok}
 ❌ Xato: {error}
