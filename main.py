@@ -145,6 +145,7 @@ Quyidagi qoidabuzarliklarni avtomatik nazorat qilaman:
 🔗 Reklama va linklar
 🤬 Nomaqbul so'zlar
 ♻️ Ketma-ket yuborilgan bir xil xabarlar
+🚪 Guruhdagi kirdi-chiqdi xabarlarini o'chiraman
 
 Guruhingiz xavfsizligi uchun 24/7 xizmatdaman.
 
