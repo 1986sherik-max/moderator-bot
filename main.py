@@ -135,20 +135,21 @@ async def start(message: Message):
     await save_user(message.from_user)
 
     await message.answer(
-        "Assalomu alaykum! 👋
+        """Assalomu alaykum! 👋
 
-Men Yordamchi botman.
+Men **Yordamchi bot**man. 🛡
 
-🛡 Quyidagi qoidabuzarliklarni avtomatik nazorat qilaman:
+Quyidagi qoidabuzarliklarni avtomatik nazorat qilaman:
 
 🚫 Spam va flood
 🔗 Reklama va linklar
 🤬 Nomaqbul so'zlar
 ♻️ Ketma-ket yuborilgan bir xil xabarlar
 
-Guruhingiz xavfsizligi uchun 24/7 xizmatdaman. To'liq ishlashim uchun meni administrator qilib qo'ying. Bot yaxshi ishlashi uchun guruhda admin maqomini bering."
-    )
+Guruhingiz xavfsizligi uchun 24/7 xizmatdaman.
 
+⚙️ To'liq ishlashim uchun meni guruhga **Administrator** qilib qo'ying."""
+    )
 
     if message.chat.type == "private":
 
