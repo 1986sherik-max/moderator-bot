@@ -185,64 +185,115 @@ async def bot_added(event: ChatMemberUpdated):
 
 
 
-# ================= ELON =================
+# ================= ELON YUBORISH (TEXT + PHOTO + VIDEO + DOCUMENT) =================
 
 
-@dp.message(Command("elon"))
-async def send_text_elon(message: Message):
-    await send_to_groups(message, message.text.replace("/elon", "").strip())
-
-
-@dp.message(F.photo | F.video | F.document)
-async def send_media_elon(message: Message):
-
-    if message.from_user.id != OWNER_ID:
-        return
-
-    await send_to_groups(message, message.caption)
-
-
-async def send_to_groups(message, text=None):
+async def send_to_groups(message: Message):
 
     async with pool.acquire() as db:
+
         groups = await db.fetch(
             "SELECT chat_id FROM groups"
         )
 
+
+    success = 0
+    failed = 0
+
+
     for group in groups:
+
         chat_id = group["chat_id"]
+
 
         try:
 
+            # RASM
             if message.photo:
+
                 await bot.send_photo(
-                    chat_id,
-                    message.photo[-1].file_id,
-                    caption=text
+                    chat_id=chat_id,
+                    photo=message.photo[-1].file_id,
+                    caption=message.caption
                 )
 
+
+            # VIDEO
             elif message.video:
+
                 await bot.send_video(
-                    chat_id,
-                    message.video.file_id,
-                    caption=text
+                    chat_id=chat_id,
+                    video=message.video.file_id,
+                    caption=message.caption
                 )
 
+
+            # HUJJAT
             elif message.document:
+
                 await bot.send_document(
-                    chat_id,
-                    message.document.file_id,
-                    caption=text
+                    chat_id=chat_id,
+                    document=message.document.file_id,
+                    caption=message.caption
                 )
 
-            else:
+
+            # MATN
+            elif message.text:
+
+                text = message.text.replace(
+                    "/elon",
+                    ""
+                ).strip()
+
+
                 await bot.send_message(
                     chat_id,
                     text
                 )
 
+
+            success += 1
+
+
         except Exception:
-            pass
+
+            failed += 1
+
+
+
+    await message.answer(
+        f"""
+✅ E'lon yuborildi
+
+📢 Guruhlar: {success}
+❌ Xato: {failed}
+"""
+    )
+
+
+
+# Oddiy matn uchun
+
+@dp.message(Command("elon"))
+async def text_elon(message: Message):
+
+    if message.from_user.id != OWNER_ID:
+        return
+
+    await send_to_groups(message)
+
+
+
+# Rasm, video, document uchun
+
+@dp.message(F.photo | F.video | F.document)
+async def media_elon(message: Message):
+
+    if message.from_user.id != OWNER_ID:
+        return
+
+    await send_to_groups(message)
 
 
 
