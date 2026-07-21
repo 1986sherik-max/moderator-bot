@@ -34,7 +34,6 @@ LINK_PATTERN = re.compile(
 
 
 BLACKLIST = [
-    "am",
     "porno",
     "kotmisan",
     "bukmeker",
@@ -54,7 +53,6 @@ BLACKLIST = [
     "amimga",
     "oneni",
      "ski",
-    "ам",
     "сикади",
     "жалаб",
     "ски",
