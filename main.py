@@ -359,6 +359,7 @@ async def moderator(message: Message):
 
 
 
+
    text = message.text.lower()
 
     clean = re.sub(
@@ -416,18 +417,19 @@ async def moderator(message: Message):
 
             await warn.delete()
 
-            return
+                  return
 
-    # ================= LINK =================
 
-    if LINK_PATTERN.search(clean):
+# ================= RUN =================
 
-        await message.delete()
 
-        warn = await message.answer(
-            f"🚫 {message.from_user.full_name}, uyalmasdan link tashadiza?"
-        )
+async def main():
 
-        await asyncio.sleep(7)
+    await init_db()
 
-        await warn.delete()
+    await dp.start_polling(bot)
+
+
+if __name__ == "__main__":
+
+    asyncio.run(main())
