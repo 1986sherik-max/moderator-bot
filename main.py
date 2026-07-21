@@ -363,6 +363,8 @@ async def moderator(message: Message):
     chat_id = message.chat.id
 
     previous = last_message.get(chat_id)
+    print("OLD:", previous)
+print("NEW:", (message.from_user.id, clean))
 
     # Hozirgi xabarni keyinroq saqlaymiz
     if previous is not None:
