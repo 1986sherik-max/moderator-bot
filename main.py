@@ -21,7 +21,7 @@ pool = None
 
 
 LINK_PATTERN = re.compile(
-    r"(https?://|www\.|t\.me|telegram\.me|@\w+|[a-zA-Z0-9_-]+\.(ru|com|uz))",
+    r"(https?://|www\.|t\.me|t.me|telegram\.me|@\w+|[a-zA-Z0-9_-]+\.(ru|com|uz))",
     re.IGNORECASE
 )
 
