@@ -398,18 +398,22 @@ async def moderator(message: Message):
     )
 
     for word in BLACKLIST:
-        if re.search(rf"\b{re.escape(word)}\b", text, re.IGNORECASE):
 
-            await message.delete()
+    if (
+        re.search(rf"\b{re.escape(word)}\b", text, re.IGNORECASE)
+        or word in clean
+    ):
 
-            warn = await message.answer(
-                f"🚫 {message.from_user.full_name}, ko'pkotta odam uyalmismi shuni yozgani?"
-            )
+        await message.delete()
 
-            await asyncio.sleep(7)
-            await warn.delete()
+        warn = await message.answer(
+            f"🚫 {message.from_user.full_name}, ko'pkotta odam uyalmismi shuni yozgani?"
+        )
 
-            return
+        await asyncio.sleep(7)
+        await warn.delete()
+
+        return
 
     if LINK_PATTERN.search(clean):
 
