@@ -402,4 +402,4 @@ async def main():
 
 if __name__ == "__main__":
 
-    asyncio.run(main())     shu kodni ozgartirib qayta jonat
+    asyncio.run(main())
