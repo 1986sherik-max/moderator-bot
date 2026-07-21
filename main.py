@@ -353,12 +353,11 @@ async def moderator(message: Message):
 
     text = message.text.lower()
 
-        clean = re.sub(
+    clean = re.sub(
         r"\s+",
         "",
         text
     )
-
     # ================= KETMA-KET BIR XIL XABAR =================
 
     chat_id = message.chat.id
