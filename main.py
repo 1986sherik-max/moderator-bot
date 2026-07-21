@@ -135,7 +135,18 @@ async def start(message: Message):
     await save_user(message.from_user)
 
     await message.answer(
-        "Assalomu alaykum! 🛡 Moderator Bot ishga tushdi! Bot guruhingizni spam va uyatsiz so'zlardan tozalaydi. Bot yaxshi ishlashi uchun guruhda admin maqomini bering."
+        "Assalomu alaykum! 👋
+
+Men Yordamchi botman.
+
+🛡 Quyidagi qoidabuzarliklarni avtomatik nazorat qilaman:
+
+🚫 Spam va flood
+🔗 Reklama va linklar
+🤬 Nomaqbul so'zlar
+♻️ Ketma-ket yuborilgan bir xil xabarlar
+
+Guruhingiz xavfsizligi uchun 24/7 xizmatdaman. To'liq ishlashim uchun meni administrator qilib qo'ying. Bot yaxshi ishlashi uchun guruhda admin maqomini bering."
     )
 
 
