@@ -383,7 +383,7 @@ clean = re.sub(
 )
 
 
-    for word in BLACKLIST:
+ for word in BLACKLIST:
 
         if word in text:
 
