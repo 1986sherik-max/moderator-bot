@@ -353,37 +353,38 @@ async def moderator(message: Message):
 
     text = message.text.lower()
 
-    clean = re.sub(
+        clean = re.sub(
         r"\s+",
         "",
         text
     )
+
     # ================= KETMA-KET BIR XIL XABAR =================
 
-chat_id = message.chat.id
+    chat_id = message.chat.id
 
-last = last_message.get(chat_id)
+    last = last_message.get(chat_id)
 
-if last is not None:
-    if (
-        last["user_id"] == message.from_user.id
-        and last["text"] == clean
-    ):
-        await message.delete()
+    if last is not None:
+        if (
+            last["user_id"] == message.from_user.id
+            and last["text"] == clean
+        ):
+            await message.delete()
 
-        warn = await message.answer(
-            f"🚫 {message.from_user.full_name}, hammayoni spam qivordizu! 🤦‍♂️"
-        )
+            warn = await message.answer(
+                f"🚫 {message.from_user.full_name}, hammayoni spam qivordizu! 🤦‍♂️"
+            )
 
-        await asyncio.sleep(7)
-        await warn.delete()
-        return
+            await asyncio.sleep(7)
+            await warn.delete()
+            return
 
-# Oxirgi xabarni yangilaymiz
-last_message[chat_id] = {
-    "user_id": message.from_user.id,
-    "text": clean
-}
+    # Oxirgi xabarni yangilaymiz
+    last_message[chat_id] = {
+        "user_id": message.from_user.id,
+        "text": clean
+    }
 
     # ================= QORA RO'YXAT =================
 
@@ -402,7 +403,6 @@ last_message[chat_id] = {
             await warn.delete()
 
             return
-
 
 # ================= RUN =================
 
