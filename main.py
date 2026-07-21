@@ -358,7 +358,7 @@ async def moderator(message: Message):
         if repeat_count[key] == 1:
 
             warn = await message.answer(
-                f"🚫 {message.from_user.full_name}, bir xil xabarni ketma-ket yubormang!"
+                f"🚫 {message.from_user.full_name}, hammayoni spam qivordizu!🤦‍♂️"
             )
 
             await asyncio.sleep(7)
