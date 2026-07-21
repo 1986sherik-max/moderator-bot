@@ -294,7 +294,23 @@ async def media_elon(message: Message):
 
     await send_to_groups(message)
 
+# ================= XIZMAT XABARLARINI O'CHIRISH =================
 
+@dp.message(
+    F.new_chat_members |
+    F.left_chat_member
+)
+async def delete_service_messages(message: Message):
+
+    if message.chat.type not in ("group", "supergroup"):
+        return
+
+    await asyncio.sleep(5)
+
+    try:
+        await message.delete()
+    except:
+        pass
 
 # ================= MODERATOR =================
 
