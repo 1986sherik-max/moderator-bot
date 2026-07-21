@@ -389,7 +389,7 @@ async def moderator(message: Message):
         "text": text
     }
 
-    repeat_count[(chat_id, user_id)] = 0
+repeat_count[(chat_id, user_id)] = 0
 
 clean = re.sub(
     r"\s+",
