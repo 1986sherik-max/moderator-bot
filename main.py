@@ -2,9 +2,7 @@ import asyncio
 import os
 import re
 import asyncpg
-from collections import defaultdict
-
-user_messages = defaultdict(lambda: {"text": "", "count": 0})
+last_message = {}
 from aiogram import Bot, Dispatcher, F
 from aiogram.filters import Command
 from aiogram.types import Message, ChatMemberUpdated
@@ -369,23 +367,16 @@ async def moderator(message: Message):
         "",
         text
     )
-    # ===== TAKRORIY XABAR SPAM HIMOYASI =====
+       # ===== KETMA-KET BIR XIL XABAR SPAM =====
 
-    last = user_messages[message.from_user.id]
+    chat_id = message.chat.id
 
-    if last["text"] == clean:
-        last["count"] += 1
-    else:
-        last["text"] = clean
-        last["count"] = 1
+    if chat_id in last_message:
+        last_user, last_text = last_message[chat_id]
 
-    # Birinchi xabar qoladi, keyingilari o'chiriladi
-    if last["count"] >= 2:
+        if last_user == message.from_user.id and last_text == clean:
 
-        await message.delete()
-
-        # Faqat birinchi takrorlanganda ogohlantirish chiqariladi
-        if last["count"] == 2:
+            await message.delete()
 
             warn = await message.answer(
                 f"🚫 {message.from_user.full_name}, hammayoni spam qivordizu! 🤦‍♂️"
@@ -395,7 +386,12 @@ async def moderator(message: Message):
 
             await warn.delete()
 
-        return
+            return
+
+    last_message[chat_id] = (
+        message.from_user.id,
+        clean
+    )
 
     for word in BLACKLIST:
 
