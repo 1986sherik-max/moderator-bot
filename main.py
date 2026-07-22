@@ -66,6 +66,16 @@ BLACKLIST = [
     "a_m",
     "а_м",
     "а*м",
+    "кото",
+    "qoto",
+    "quto",
+    "qutogim",
+    "nastroy",
+     "nastroyga",
+    "skay",
+    "скай",
+    "котла",
+    "порно",
     
 ]
 
