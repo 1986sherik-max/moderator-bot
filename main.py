@@ -82,6 +82,9 @@ BLACKLIST = [
     "куто",
     "кутла",
     "yiban",
+    "dalbayobla",
+    "yibanla",
+    "qotogimmi",
 ]
 
 
