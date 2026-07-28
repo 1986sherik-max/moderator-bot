@@ -85,6 +85,7 @@ BLACKLIST = [
     "dalbayobla",
     "yibanla",
     "qotogimmi",
+    "dalbayob",
 ]
 
 
