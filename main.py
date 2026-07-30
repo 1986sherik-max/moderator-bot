@@ -89,6 +89,14 @@ BLACKLIST = [
     "yibanla",
     "qotogimmi",
     "dalbayob",
+    "кутток",
+    "кутоо",
+    "kotto",
+    "junli",
+    "kutoq",
+    "qotogimi",
+    "xuy",
+    "хуй",
 ]
 
 
