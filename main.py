@@ -73,6 +73,7 @@ BLACKLIST = [
     "qoto",
     "quto",
     "qutogim",
+     "qotogim",
     "nastroy",
      "nastroyga",
     "skay",
