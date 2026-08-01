@@ -97,6 +97,11 @@ BLACKLIST = [
     "qotogimi",
     "xuy",
     "хуй",
+      "сикиш",
+    "sikish",
+    "naxuy",
+    "nаxuy",
+    "нахуй",
 ]
 
 
