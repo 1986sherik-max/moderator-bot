@@ -88,8 +88,11 @@ BLACKLIST = [
     "yiban",
     "dalbayobla",
     "yibanla",
+    "сиктираман",
     "qotogimmi",
     "dalbayob",
+    "siktiraman",
+    "amman",
     "кутток",
     "кутоо",
     "kotto",
@@ -103,6 +106,8 @@ BLACKLIST = [
     "naxuy",
     "nаxuy",
     "нахуй",
+     "qottogi",
+     "куттоги",
 ]
 
 
