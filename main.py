@@ -65,6 +65,7 @@ BLACKLIST = [
     "oneni",
      "ski",
     "сикади",
+    "секс",
     "sikadi",
     "сикишади",
     "sikishadi",
