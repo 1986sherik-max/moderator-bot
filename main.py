@@ -53,6 +53,7 @@ BLACKLIST = [
     "jalab",
     "jallab",
     "kot",
+    "куток",
     "suka",
     "dalbayop",
     "suchara",
