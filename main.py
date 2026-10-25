@@ -8,11 +8,12 @@ from aiogram import Bot, Dispatcher, F
 from aiogram.filters import Command
 from aiogram.types import Message, ChatMemberUpdated
 
+
 TOKEN = os.getenv("BOT_TOKEN")
 DATABASE_URL = os.getenv("DATABASE_URL")
 OWNER_ID = 711427177
 
-bot = Bot(token=TOKEN)
+bot = Bot(token=TOKEN) if TOKEN else None
 dp = Dispatcher()
 pool = None
 
@@ -35,10 +36,10 @@ BLACKLIST = [
     "quto", "qutogim", "qotogim", "nastroy", "nastroyga",
     "skay", "скай", "котла", "порно", "настрой",
     "настройга", "куто", "кутла", "yiban", "dalbayobla",
-    "yibanla", "сиктираман", "qotogimmi", "siktiraman",
-    "кутток", "кутоо", "kotto", "junli", "kutoq",
-    "qotogimi", "xuy", "хуй", "сикиш", "sikish", "naxuy",
-    "nаxuy", "нахуй", "qottogi", "куттоги"
+    "yibanla", "сиктираман", "qotogimmi", "dalbayob",
+    "siktiraman", "кутток", "кутоо", "kotto", "junli",
+    "kutoq", "qotogimi", "xuy", "хуй", "сикиш", "sikish",
+    "naxuy", "nаxuy", "нахуй", "qottogi", "куттоги"
 ]
 
 
@@ -46,6 +47,7 @@ BLACKLIST = [
 
 async def init_db():
     global pool
+
     pool = await asyncpg.create_pool(DATABASE_URL)
 
     async with pool.acquire() as db:
@@ -66,14 +68,17 @@ async def init_db():
 
 
 async def save_user(user):
-    if not user:
+    if user is None:
         return
 
     async with pool.acquire() as db:
         await db.execute("""
             INSERT INTO users(user_id, full_name, username)
             VALUES($1, $2, $3)
-            ON CONFLICT(user_id) DO NOTHING
+            ON CONFLICT(user_id)
+            DO UPDATE SET
+                full_name = EXCLUDED.full_name,
+                username = EXCLUDED.username
         """, user.id, user.full_name, user.username)
 
 
@@ -100,15 +105,15 @@ async def start(message: Message):
         "Assalomu alaykum! 👋\n\n"
         "Men Yordamchi botman. 🛡\n\n"
         "🚫 Spam va flood nazorati\n"
-        "🔗 Reklama va havolalarni nazorat qilish\n"
-        "🤬 Nomaqbul so'zlarni o'chirish\n"
-        "♻️ Takroriy xabarlarni o'chirish\n"
-        "🚪 Guruhga kirish-chiqish xabarlarini o'chirish\n\n"
+        "🔗 Reklama va havolalar\n"
+        "🤬 Nomaqbul so'zlar\n"
+        "♻️ Takroriy xabarlar\n"
+        "🚪 Kirish-chiqish xabarlarini o'chirish\n\n"
         "To'liq ishlashim uchun meni guruhga administrator qiling "
         "va xabarlarni o'chirish huquqini bering."
     )
 
-    if message.chat.type == "private" and message.from_user:
+    if message.chat.type == "private":
         try:
             await bot.send_message(
                 OWNER_ID,
@@ -118,10 +123,10 @@ async def start(message: Message):
                 f"📛 Username: @{message.from_user.username or 'yo‘q'}"
             )
         except Exception as e:
-            print(f"Owner xabari yuborilmadi: {e}")
+            print(f"Owner xabari: {e}")
 
 
-# ================ BOT GURUHGA QO'SHILGANDA ================
+# ================ BOT GURUHGA QO'SHILISHI ================
 
 @dp.my_chat_member()
 async def bot_added(event: ChatMemberUpdated):
@@ -142,27 +147,27 @@ async def bot_added(event: ChatMemberUpdated):
                     f"🆔 ID: {event.chat.id}"
                 )
             except Exception as e:
-                print(f"Owner xabari yuborilmadi: {e}")
+                print(f"Owner xabari: {e}")
 
 
-# ================ KIRISH-CHIQISH XABARLARI ================
+# ================ KIRISH-CHIQISH XABARLARINI O'CHIRISH ================
 
 @dp.message(F.new_chat_members)
 async def delete_join_message(message: Message):
     try:
         await message.delete()
-        print(f"Kirish xabari o'chirildi: {message.chat.id}")
+        print(f"✅ Kirish xabari o'chirildi: {message.chat.id}")
     except Exception as e:
-        print(f"Kirish xabarini o'chirish xatosi: {e}")
+        print(f"❌ Kirish xabarini o'chirish xatosi: {e}")
 
 
 @dp.message(F.left_chat_member)
 async def delete_leave_message(message: Message):
     try:
         await message.delete()
-        print(f"Chiqish xabari o'chirildi: {message.chat.id}")
+        print(f"✅ Chiqish xabari o'chirildi: {message.chat.id}")
     except Exception as e:
-        print(f"Chiqish xabarini o'chirish xatosi: {e}")
+        print(f"❌ Chiqish xabarini o'chirish xatosi: {e}")
 
 
 # ================ E'LON YUBORISH ================
@@ -184,24 +189,29 @@ async def send_to_groups(message: Message):
                     photo=message.photo[-1].file_id,
                     caption=message.caption
                 )
+
             elif message.video:
                 await bot.send_video(
                     chat_id=chat_id,
                     video=message.video.file_id,
                     caption=message.caption
                 )
+
             elif message.document:
                 await bot.send_document(
                     chat_id=chat_id,
                     document=message.document.file_id,
                     caption=message.caption
                 )
+
             elif message.text:
                 text = message.text.replace("/elon", "", 1).strip()
-                if text:
-                    await bot.send_message(chat_id, text)
-                else:
+
+                if not text:
                     continue
+
+                await bot.send_message(chat_id, text)
+
             else:
                 continue
 
@@ -209,7 +219,7 @@ async def send_to_groups(message: Message):
 
         except Exception as e:
             failed += 1
-            print(f"E'lon xatosi {chat_id}: {e}")
+            print(f"❌ E'lon yuborilmadi {chat_id}: {e}")
 
     await message.answer(
         f"✅ E'lon yuborildi\n\n"
@@ -245,12 +255,16 @@ async def moderator(message: Message):
 
     try:
         member = await bot.get_chat_member(
-            message.chat.id, message.from_user.id
+            message.chat.id,
+            message.from_user.id
         )
+
         if member.status in ("administrator", "creator"):
             return
+
     except Exception as e:
-        print(f"Admin tekshirish xatosi: {e}")
+        print(f"Adminni tekshirish xatosi: {e}")
+        return
 
     text = message.text.lower().strip()
     chat_id = message.chat.id
@@ -258,7 +272,12 @@ async def moderator(message: Message):
 
     last = last_chat_message.get(chat_id)
 
-    if last and last["user_id"] == user_id and last["text"] == text:
+    # Ketma-ket bir xil xabar
+    if (
+        last
+        and last["user_id"] == user_id
+        and last["text"] == text
+    ):
         key = (chat_id, user_id)
         repeat_count[key] = repeat_count.get(key, 0) + 1
 
@@ -272,8 +291,9 @@ async def moderator(message: Message):
                 )
                 await asyncio.sleep(7)
                 await warn.delete()
+
         except Exception as e:
-            print(f"Takroriy xabarni o'chirish xatosi: {e}")
+            print(f"Takroriy xabar xatosi: {e}")
 
         return
 
@@ -283,8 +303,13 @@ async def moderator(message: Message):
     }
     repeat_count[(chat_id, user_id)] = 0
 
+    # Nomaqbul so'zlar
     for word in BLACKLIST:
-        if re.search(rf"\b{re.escape(word)}\b", text, re.IGNORECASE):
+        if re.search(
+            rf"\b{re.escape(word)}\b",
+            text,
+            re.IGNORECASE
+        ):
             try:
                 await message.delete()
                 warn = await message.answer(
@@ -293,10 +318,13 @@ async def moderator(message: Message):
                 )
                 await asyncio.sleep(7)
                 await warn.delete()
+
             except Exception as e:
-                print(f"Nomaqbul xabarni o'chirish xatosi: {e}")
+                print(f"Nomaqbul xabar xatosi: {e}")
+
             return
 
+    # Havolalar
     clean = re.sub(r"\s+", "", text)
 
     if LINK_PATTERN.search(clean):
@@ -308,27 +336,32 @@ async def moderator(message: Message):
             )
             await asyncio.sleep(7)
             await warn.delete()
+
         except Exception as e:
-            print(f"Havolani o'chirish xatosi: {e}")
+            print(f"Havola xatosi: {e}")
 
 
 # ================ RUN ================
 
 async def main():
     if not TOKEN:
-        raise RuntimeError("BOT_TOKEN sozlanmagan!")
+        raise RuntimeError("Railway Variables ichida BOT_TOKEN yo'q!")
+
     if not DATABASE_URL:
-        raise RuntimeError("DATABASE_URL sozlanmagan!")
+        raise RuntimeError("Railway Variables ichida DATABASE_URL yo'q!")
 
     await init_db()
-  await dp.start_polling(
-    bot,
-    allowed_updates=[
-        "message",
-        "my_chat_member",
-        "chat_member"
-    ]
-)
+
+    print("🤖 Bot ishga tushmoqda...")
+
+    await dp.start_polling(
+        bot,
+        allowed_updates=[
+            "message",
+            "my_chat_member",
+            "chat_member"
+        ]
+    )
 
 
 if __name__ == "__main__":
