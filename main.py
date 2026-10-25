@@ -321,7 +321,14 @@ async def main():
         raise RuntimeError("DATABASE_URL sozlanmagan!")
 
     await init_db()
-    await dp.start_polling(bot)
+  await dp.start_polling(
+    bot,
+    allowed_updates=[
+        "message",
+        "my_chat_member",
+        "chat_member"
+    ]
+)
 
 
 if __name__ == "__main__":
